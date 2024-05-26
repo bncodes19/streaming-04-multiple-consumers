@@ -1,9 +1,10 @@
 """
     This program sends a message to a queue on the RabbitMQ server.
     Make tasks harder/longer-running by adding dots at the end of the message.
+    Messages are sent from a defined CSV file (tasks.csv in this example).
 
-    Author: Denise Case
-    Date: January 15, 2023
+    Author: Brett Neely
+    Date: May 26th, 2024
 
 """
 
@@ -60,6 +61,7 @@ def send_message(host: str, queue_name: str, message: str):
         conn.close()
 
 def read_tasks_and_send_tasks(file_name: str, host: str, queue: str):
+    """ Function to read tasks and send tasks from a csv file"""
     with open(file_name) as task_file:
         csvreader = csv.reader(task_file)
         for row in csvreader:
