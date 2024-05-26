@@ -11,6 +11,13 @@ import pika
 import sys
 import webbrowser
 
+# Needed for CSV functions (read/write)
+import csv
+
+# From the util_logger.py file import the setup_logger function
+from util_logger import setup_logger
+logger, logname = setup_logger(__file__)
+
 def offer_rabbitmq_admin_site():
     """Offer to open the RabbitMQ Admin website"""
     ans = input("Would you like to monitor RabbitMQ queues? y or n ")
@@ -52,6 +59,14 @@ def send_message(host: str, queue_name: str, message: str):
         # close the connection to the server
         conn.close()
 
+def read_tasks_and_send_tasks(file_name: str, host: str, queue: str):
+    with open(file_name) as task_file:
+        csvreader = csv.reader(task_file)
+        for row in csvreader:
+            task_message = "".join(row)
+            send_message(host, queue, task_message)
+
+
 # Standard Python idiom to indicate main program entry point
 # This allows us to import this module and use its functions
 # without executing the code below.
@@ -63,6 +78,13 @@ if __name__ == "__main__":
     # if no arguments are provided, use the default message
     # use the join method to convert the list of arguments into a string
     # join by the space character inside the quotes
-    message = " ".join(sys.argv[1:]) or "Second task....."
+    
+    # variable to reference where the task csv is stored
+    task_file = 'tasks.csv'
+    host = 'localhost'
+
+    #message = " ".join(sys.argv[1:]) or "Second task....."
     # send the message to the queue
-    send_message("localhost","task_queue2",message)
+    #send_message("localhost","task_queue2",message)
+
+    read_tasks_and_send_tasks(task_file, host, 'task_queue')
